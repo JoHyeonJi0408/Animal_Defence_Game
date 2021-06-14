@@ -87,7 +87,7 @@ public class SimpleMonster : MonoBehaviour
                 //현지의 스크립트에서 총알의 데미지를 가져옴.
                 //int dmg = 가져온 총알의 데미지.
                 onHit(bullet.dmg);
-                Destroy(collision.gameObject);
+                //Destroy(collision.gameObject);
                 break;
             case "Ground1":
                 Destroy(collision.gameObject);

@@ -5,6 +5,9 @@ using UnityEngine;
 public class AnimalAttack : MonoBehaviour
 {
     public GameObject Weaponpf; // 무기 프리팹
+    private List<GameObject> weaponList = new List<GameObject>(); // 무기 리스트
+    private int weaponMax = 10; // 생성할 무기 수
+    private int weaponIndex = 0; // 무기 인덱스
     private Rigidbody2D rigid;
     private Vector3 firstPosition; // 오브젝트 처음 위치 저장
     public float maxShotDelay; // 공격 속도(쏘는데 걸리는 시간, 낮을 수록 빠름)
@@ -14,6 +17,13 @@ public class AnimalAttack : MonoBehaviour
     {
         // 오브젝트 처음 위치 저장
         firstPosition = this.transform.position;
+        // 무기 미리 생성
+        for(int i=0; i < weaponMax; ++i)
+        {
+            GameObject weapon = Instantiate<GameObject>(Weaponpf);
+            weapon.gameObject.SetActive(false);
+            weaponList.Add(weapon);
+        }
     }
 
     void Update()
@@ -30,8 +40,11 @@ public class AnimalAttack : MonoBehaviour
         if (curShotDelay < maxShotDelay)
             return;
 
-        GameObject weapon = Instantiate(Weaponpf, firstPosition, transform.rotation); // 무기 생성
-        Rigidbody2D rigid = weapon.GetComponent<Rigidbody2D>();
+        //GameObject weapon = Instantiate(Weaponpf, firstPosition, transform.rotation); // 무기 생성
+        weaponList[weaponIndex].transform.position = firstPosition; // 무기 초기 위치 설정
+        weaponList[weaponIndex].transform.rotation = transform.rotation;
+        weaponList[weaponIndex].gameObject.SetActive(true); // 무기 활성화
+        Rigidbody2D rigid = weaponList[weaponIndex].GetComponent<Rigidbody2D>();
 
         GameObject[] enemys = GameObject.FindGameObjectsWithTag("Enemy"); // Enemy Tag로 적들 찾기
         GameObject[] bosses = GameObject.FindGameObjectsWithTag("Boss"); // Enemy Tag로 적들 찾기
@@ -64,6 +77,16 @@ public class AnimalAttack : MonoBehaviour
         rigid.AddRelativeForce(Vector2.up * 20, ForceMode2D.Impulse); // 공격
 
         curShotDelay = 0;
+
+        // 마지막 무기를 발사했다면 처음 무기 발사할 준비
+        if (weaponIndex >= weaponMax - 1)
+        {
+            weaponIndex = 0;
+        }
+        else
+        {
+            weaponIndex++;
+        }
     }
 
     private void ShotDelay()
